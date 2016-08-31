@@ -54,14 +54,11 @@ config_file_name: myconfig.yml
 ```
 Then `scm` will open config file in path `HelloWorld/myconfig.yml`
 Available options:
-| Option | Description|
------------------------
+| Option | Description |
+|--------|-------------|
 | project_folder | Folder for config |
---------------------------------------
 | config_file_name | Config file name |
----------------------------------------
 | target | Generated interface target language (right now only swift available |
---------------------------------------------------------------------------------
 | gen_interface_name | Name for generated interface |
 
 Ok. Now edit your config. For example:
