@@ -15,18 +15,18 @@ IS_PRECOMPILE=false
 for i in "$@"
 do
 case $i in
--g|--generate)
-IS_GENERATE=true
-shift
-;;
--pre|--precompile)
-IS_PRECOMPILE=true
-shift
-;;
--post|--postcompile)
-IS_GENERATE=true
-shift
-;;
+    -g|--generate)
+    IS_GENERATE=true
+    shift
+    ;;
+    -pre|--precompile)
+    IS_PRECOMPILE=true
+    shift
+    ;;
+    -post|--postcompile)
+    IS_GENERATE=true
+    shift
+    ;;
 esac
 done
 
@@ -77,8 +77,8 @@ SOURCE_FILE="$project_folder/$gen_interface_name.$target"
 
 if [ "$IS_GENERATE" == true ]; then
 echo "Generate interface in $SOURCE_FILE"
-printf "class SecretConfig {\n$interface_empty_str}" > $SOURCE_FILE
+printf "class $gen_interface_name {\n$interface_empty_str}" > $SOURCE_FILE
 elif [ "$IS_PRECOMPILE" == true ]; then
 echo "Generate actual config in $SOURCE_FILE"
-printf "class SecretConfig {\n$interface_full_str}" > $SOURCE_FILE
+printf "class $gen_interface_name {\n$interface_full_str}" > $SOURCE_FILE
 fi
