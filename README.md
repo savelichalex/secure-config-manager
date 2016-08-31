@@ -53,7 +53,9 @@ project_folder: HelloWorld
 config_file_name: myconfig.yml
 ```
 Then `scm` will open config file in path `HelloWorld/myconfig.yml`.
+
 Available options:
+
 Option | Description
 -------|------------
 project_folder | Folder for config
