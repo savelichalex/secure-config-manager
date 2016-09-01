@@ -9,12 +9,17 @@
 
 # Get attributes
 
+IS_INIT=false
 IS_GENERATE=false
 IS_PRECOMPILE=false
 
 for i in "$@"
 do
 case $i in
+    -i|--init)
+    IS_INIT=true
+    shift
+    ;;
     -g|--generate)
     IS_GENERATE=true
     shift
@@ -29,6 +34,15 @@ case $i in
     ;;
 esac
 done
+
+# Simple initialization
+if [ "$IS_INIT" = true ]; then
+  printf "target: swift\n" > .scmrc
+  printf "example: key" > config.yml
+  printf "example: key" > config.yml.sample
+  echo "scm files generated, please update .scmrc and config.yml"
+  exit
+fi
 
 # Create 'prototype' props
 
