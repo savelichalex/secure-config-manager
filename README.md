@@ -8,21 +8,21 @@ Create configs for swift project doesn't easy. There is few problems with it.
 When you create with public keys, like OAuth tokens, you might don't want to
 add it under version control system. If you use git you add this file to `.gitignore`.
 But problem with it, that you must add this config to your project for main bundle.
-This is problem, becouse your project contain info about file, that doesn't exist in repo.
+This is problem, because your project contain info about file, that doesn't exist in repo.
 
 You of course can create empty plist, add it to project, add it under version control and then
 don't track any changes on this file. Something like this `git update-index --assume-unchanged [path]`.
 You now can add secret keys, and it not under version control. Good.
-Not so fast. Why? Becouse if you revert changes or anything else you lost all your keys.
+Not so fast. Why? Because if you revert changes or anything else you lost all your keys.
 
 Another bad option with plist is code obfuscation. If somebody want's to know your keys, then he can easily find it
-`ipa` file. Because this is resources!
+`.ipa` file. Because this is resources!
 
-Another one bad options is type safety. Whith plists you wark with raw data, and need to cast every value. This is awful.
+Another one bad options is type safety. With plists you work with raw data, and need to cast every value. This is awful.
 
 ## Solution
 
-Secure-config-manager is easy shell script that get your config (which not under version control) and 
+Secure-config-manager is easy shell script that get your config (which not under version control) and
 generate code for it. First time they generate empty class with static properties, that is interface of our config. You can easily use it in your code. Script have options that must be embeded to build phases, which generate code with real
 data right in compilation and revert changes then.
 
@@ -59,7 +59,7 @@ Available options:
 Option | Description
 -------|------------
 project_folder | Folder for config
-config_file_name | Config file name
+config_file | Config file name (file must be in YAML format, <br/>but this is field is just name, i.e. for file <br/>`myconf.yml` name is `myconf`)
 target | Generated interface target language (right now only swift available |
 gen_interface_name | Name for generated interface
 

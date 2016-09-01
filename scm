@@ -2,54 +2,19 @@
 
 #  scm.sh
 #  secure-config-manager
-#  Easily create secret configs for swift projects, that should be on main bundle after compilation, but not shown on git repo
+#  Easily create secret configs for swift projects, that should be on main bundle
+# after compilation, but not shown on git repo
 #
 #  Created by savelichalex on 31.08.16.
 #  Copyright © 2016 savelichalex. All rights reserved.
 
-# Get attributes
+# Basic vars
 
-IS_INIT=false
-IS_GENERATE=false
-IS_PRECOMPILE=false
+rc_file=.scmrc
+config_file_name="config"
+config_file="$config_file_name.yml"
 
-for i in "$@"
-do
-case $i in
-    -i|--init)
-    IS_INIT=true
-    shift
-    ;;
-    -g|--generate)
-    IS_GENERATE=true
-    shift
-    ;;
-    -pre|--precompile)
-    IS_PRECOMPILE=true
-    shift
-    ;;
-    -post|--postcompile)
-    IS_GENERATE=true
-    shift
-    ;;
-esac
-done
-
-# Simple initialization
-if [ "$IS_INIT" = true ]; then
-  printf "target: swift\n" > .scmrc
-  printf "example: key" > config.yml
-  printf "example: key" > config.yml.sample
-  echo "scm files generated, please update .scmrc and config.yml"
-  exit
-fi
-
-# Create 'prototype' props
-
-project_folder="."
-target="swift"
-gen_interface_name="SecretConfig"
-config_file_name="config.yml"
+# Functions
 
 parse_yaml2() {
     local prefix=$2
@@ -67,11 +32,72 @@ parse_yaml2() {
     }'
 }
 
+init() {
+    printf "target: swift\n" > $rc_file
+    printf "example: key" > $config_file
+    printf "example: key" > "$config_file.sample"
+    echo "scm files generated, please update $rc_file and $config_file"
+}
+
+help() {
+cat <<-EOM
+SCM - Easily create secret configs for swift projects
+
+Usage: scm [-i|--init]
+           [-g|--generate]
+           [-pre|--precompile]
+           [-post|--postcompile]
+EOM
+}
+
+# Get attributes
+
+IS_GENERATE=false
+IS_PRECOMPILE=false
+
+for i in "$@"
+do
+case $i in
+    -i|--init)
+    init
+    exit 0
+    shift
+    ;;
+    -g|--generate)
+    IS_GENERATE=true
+    shift
+    ;;
+    -pre|--precompile)
+    IS_PRECOMPILE=true
+    shift
+    ;;
+    -post|--postcompile)
+    IS_GENERATE=true
+    shift
+    ;;
+    -h|--help)
+    help
+    exit 0
+    shift
+    ;;
+esac
+done
+
+# Create 'prototype' props
+
+project_folder="."
+target="swift"
+gen_interface_name="SecretConfig"
+# also
+# config_file_name
+
 # Parse config for util that might replace 'prototype' props
 eval $(parse_yaml2 ".scmrc")
 
+config_file="$config_file_name.yml"
+
 # Create path to real app config
-config_path="$project_folder/$config_file_name"
+config_path="$project_folder/$config_file"
 
 # Parse config and create interface
 prefix="___user_config___"
