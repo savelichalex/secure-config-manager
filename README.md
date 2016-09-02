@@ -27,9 +27,9 @@ generates code for it. At first time it generates an empty class with static pro
 
 ## Install
 
-Script is available in `brew`
+You can install with `brew`
 ```
-$ brew install secure-config-manager
+$ brew install https://raw.githubusercontent.com/savelichalex/secure-config-manager/master/secure-config-manager.rb
 ```
 
 Go to your project and init `scm`
