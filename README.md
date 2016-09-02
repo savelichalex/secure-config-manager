@@ -4,31 +4,30 @@ Create secure config for swift project easily
 
 ## Motivation
 
-Create configs for swift project doesn't easy. There is few problems with it.
-When you create with public keys, like OAuth tokens, you might don't want to
-add it under version control system. If you use git you add this file to `.gitignore`.
-But problem with it, that you must add this config to your project for main bundle.
-This is problem, because your project contain info about file, that doesn't exist in repo.
+Creating configs for swift project is not an easy task. There are few problems with it.
+When configs contain public keys, like OAuth tokens, probably you don't want to
+put them under version control system. If you use git you may add this file to `.gitignore`.
+But also you have to add this config to your project into the main bundle.
+That is a problem, because your project contains info about file, that doesn't exist in repo.
 
-You of course can create empty plist, add it to project, add it under version control and then
-don't track any changes on this file. Something like this `git update-index --assume-unchanged [path]`.
-You now can add secret keys, and it not under version control. Good.
-Not so fast. Why? Because if you revert changes or anything else you lost all your keys.
+Of course you can create empty plist, add it to the project, put it under version control and then
+not track any changes of this file. This will look similar to this: `git update-index --assume-unchanged [path]`.
+Now you can add secret keys, and it's not under version control. Good.
+Not so fast. Why? Because if you revert changes or anything else you'll lost all your keys.
 
-Another bad option with plist is code obfuscation. If somebody want's to know your keys, then he can easily find it
-`.ipa` file. Because this is resources!
+Another bad option with .plist is a code obfuscation. If someone wants to get your keys, he can easily find them in
+`.ipa` file, because .plist is a resource!
 
-Another one bad options is type safety. With plists you work with raw data, and need to cast every value. This is awful.
+Another bad option is type safety. Plists work with raw data, and you need to cast its every value. This is awful.
 
 ## Solution
 
-Secure-config-manager is easy shell script that get your config (which not under version control) and
-generate code for it. First time they generate empty class with static properties, that is interface of our config. You can easily use it in your code. Script have options that must be embeded to build phases, which generate code with real
-data right in compilation and revert changes then.
+Secure-config-manager is a simple shell script that gets your config (which is not under version control) and
+generates code for it. At first time it generates an empty class with static properties -- that is an interface of our config. You can easily use it in your code. This script has options that must be embedded in build phases in order to generate code with real data during the compilation and have possibility to revert changes.
 
 ## Install
 
-Script available in `brew`
+Script is available in `brew`
 ```
 $ brew install secure-config-manager
 ```
@@ -38,7 +37,7 @@ Go to your project and init `scm`
 $ scm --init
 ```
 
-They create few files:
+It will create few files:
 ```
 .scmrc
 config.yml
@@ -46,21 +45,21 @@ config.yml.sample
 ```
 And add few lines to `.gitignore`
 
-What is it `.scmrc`. This is settings for `scm`. Of course you might want to set it.
-For example if your `.scmrc` file looks like this
+What is `.scmrc`? It is settings for `scm`. Of course you might want to set it.
+For example, your `.scmrc` file can look like this:
 ```
 project_folder: HelloWorld
 config_file_name: myconfig.yml
 ```
-Then `scm` will open config file in path `HelloWorld/myconfig.yml`.
+Then `scm` will open config file located at path `HelloWorld/myconfig.yml`.
 
 Available options:
 
 Option | Description
 -------|------------
 project_folder | Folder for config
-config_file | Config file name (file must be in YAML format, <br/>but this is field is just name, i.e. for file <br/>`myconf.yml` name is `myconf`)
-target | Generated interface target language (right now only swift available |
+config_file | Config file name (file must be in YAML format, <br/>but this field is just a name, i.e. for file <br/>`myconf.yml` the name is `myconf`)
+target | Generated interface target language (right now only swift is available |
 gen_interface_name | Name for generated interface
 
 Ok. Now edit your config. For example:
@@ -72,15 +71,15 @@ Start `scm` again to generate interface
 ```
 $ scm --generate
 ```
-Now if you not set `gen_interface_name` you can see new generated file `SecretConfig.swift`
-They looks like this:
+Now if you did not set `gen_interface_name` you can see new generated file `SecretConfig.swift`
+It looks like this:
 ```swift
 class SecretConfig {
   static let myOAuthKey: String? = nil
 }
 ```
 
-Add generated file to project and use in code.
+Add generated file to the project and use it in code.
 ```swift
 func applicationDidFinishLaunching(aNotification: NSNotification) {
   guard let authKey = SecretConfig.myOAuthKey else {
@@ -89,15 +88,15 @@ func applicationDidFinishLaunching(aNotification: NSNotification) {
 }
 ```
 
-Another one step, now go to `Build Phases` in your project and add `Run Script` twice. One place right before
-`Compile Sources`, another one at the end.
+Next step. Now go to `Build Phases` in your project and add `Run Script` twice. Place first right before
+`Compile Sources`, place second at the end.
 First phase should contain row `scm -pre`. Second - `scm -post`.
 
 That's all. Now you can easily use secret configs!
 
 # Afterword
 
-secret-config-manager is on early stages, any issues reports and PR are wellcome!
+secret-config-manager is on early stages, any issue reports and PR are wellcome!
 
 # Roadmap
 * generate code for obective-c
