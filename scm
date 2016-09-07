@@ -99,26 +99,64 @@ config_file="$config_file_name.yml"
 # Create path to real app config
 config_path="$project_folder/$config_file"
 
-# Parse config and create interface
-prefix="___user_config___"
-eval $(parse_yaml2 $config_path $prefix)
-from_config_vars=($(compgen -v $prefix))
-for ((i=0; i<${#from_config_vars[@]}; i++))
-do
-    var=${from_config_vars[$i]}
-    name=${var#$prefix}
-    interface_empty_str+="    static let $name: String? = nil\n"
-    interface_full_str+="    static let $name: String? = \""${!var}"\"\n"
-done
+swiftGenerator() {
+    # Parse config and create interface
+    prefix="___user_config___"
+    eval $(parse_yaml2 $config_path $prefix)
+    from_config_vars=($(compgen -v $prefix))
+    for ((i=0; i<${#from_config_vars[@]}; i++))
+    do
+        var=${from_config_vars[$i]}
+        name=${var#$prefix}
+        interface_empty_str+="    static let $name: String? = nil\n"
+        interface_full_str+="    static let $name: String? = \""${!var}"\"\n"
+    done
 
-# Write result
+    # Write result
 
-SOURCE_FILE="$project_folder/$gen_interface_name.$target"
+    SOURCE_FILE="$project_folder/$gen_interface_name.swift"
 
-if [ "$IS_GENERATE" == true ]; then
-echo "Generate interface in $SOURCE_FILE"
-printf "class $gen_interface_name {\n$interface_empty_str}" > $SOURCE_FILE
-elif [ "$IS_PRECOMPILE" == true ]; then
-echo "Generate actual config in $SOURCE_FILE"
-printf "class $gen_interface_name {\n$interface_full_str}" > $SOURCE_FILE
+    if [ "$IS_GENERATE" == true ]; then
+      echo "Generate interface in $SOURCE_FILE"
+      printf "class $gen_interface_name {\n$interface_empty_str}" > $SOURCE_FILE
+    elif [ "$IS_PRECOMPILE" == true ]; then
+      echo "Generate actual config in $SOURCE_FILE"
+      printf "class $gen_interface_name {\n$interface_full_str}" > $SOURCE_FILE
+    fi
+}
+
+objcGenerator() {
+    # Parse config and create interface
+    prefix="___user_config___"
+    eval $(parse_yaml2 $config_path $prefix)
+    from_config_vars=($(compgen -v $prefix))
+    for ((i=0; i<${#from_config_vars[@]}; i++))
+    do
+        var=${from_config_vars[$i]}
+        name=${var#$prefix}
+        interface_str+="    @property (readonly) NSString *$name;\n"
+        source_empty_str+="        _$name = nil\n"
+        source_full_str+="    static let $name: String? = \""${!var}"\"\n"
+    done
+
+    # Write result
+
+    INTERFACE_FILE="$project_folder/$gen_interface_name.h"
+    SOURCE_FILE="$project_folder/$gen_interface_name.m"
+
+    if [ "$IS_GENERATE" == true ]; then
+        echo "Generate interface in $INTERFACE_FILE"
+        echo "Generate realization in $SOURCE_FILE"
+        printf "#import <Foundation/Foundation.h>\n\n@interface gen_interface_name : NSObject\n\n$interface_str\n@end" > $INTERFACE_FILE
+        printf "#import \"$gen_interface_name.h\"\n#import <Foundation/Foundation.h>\n\n@implementation $gen_interface_name\n\n- (id) init {\n  if((self = [super init])) {\n$source_empty_str  }\n  return self;\n}\n\n@end" > $SOURCE_FILE
+    elif [ "$IS_PRECOMPILE" == true ]; then
+        echo "Generate actual realization in $SOURCE_FILE"
+        printf "#import \"$gen_interface_name.h\"\n#import <Foundation/Foundation.h>\n\n@implementation $gen_interface_name\n\n- (id) init {\n  if((self = [super init])) {\n$source_full_str  }\n  return self;\n}\n\n@end" > $SOURCE_FILE
+    fi
+}
+
+if [[ "$target" == "swift" ]]; then
+    swiftGenerator
+elif [[ "$target" == "objective-c" ]]; then
+    objcGenerator
 fi
