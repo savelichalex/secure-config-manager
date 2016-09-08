@@ -13,6 +13,7 @@
 rc_file=.scmrc
 config_file_name="config"
 config_file="$config_file_name.yml"
+root_path=$(pwd)
 
 # Functions
 
@@ -75,6 +76,10 @@ case $i in
     IS_GENERATE=true
     shift
     ;;
+    -r=*|--root=*)
+    root_path="${i#*=}"
+    shift
+    ;;
     -h|--help)
     help
     exit 0
@@ -85,19 +90,19 @@ done
 
 # Create 'prototype' props
 
-project_folder="."
+project_folder=""
 target="swift"
 gen_interface_name="SecretConfig"
 # also
 # config_file_name
 
 # Parse config for util that might replace 'prototype' props
-eval $(parse_yaml2 ".scmrc")
+eval $(parse_yaml2 "$root_path/.scmrc")
 
 config_file="$config_file_name.yml"
 
 # Create path to real app config
-config_path="$project_folder/$config_file"
+config_path="$root_path/$project_folder/$config_file"
 
 swiftGenerator() {
     local config=$1
@@ -118,7 +123,7 @@ swiftGenerator() {
 
     # Write result
 
-    SOURCE_FILE="$folder/$gen_interface_name.swift"
+    SOURCE_FILE="$root_path/$folder/$gen_interface_name.swift"
 
     if [ "$IS_GENERATE" == true ]; then
       echo "Generate interface in $SOURCE_FILE"
@@ -150,8 +155,8 @@ objcGenerator() {
 
     # Write result
 
-    INTERFACE_FILE="$folder/$gen_interface_name.h"
-    SOURCE_FILE="$folder/$gen_interface_name.m"
+    INTERFACE_FILE="$root_path/$folder/$gen_interface_name.h"
+    SOURCE_FILE="$root_path/$folder/$gen_interface_name.m"
 
     if [ "$IS_GENERATE" == true ]; then
         echo "Generate interface in $INTERFACE_FILE"
@@ -184,7 +189,7 @@ javaGenerator() {
 
     # Write result
 
-    SOURCE_FILE="$folder/$gen_interface_name.java"
+    SOURCE_FILE="$root_path/$folder/$gen_interface_name.java"
 
     if [ "$IS_GENERATE" == true ]; then
         echo "Generate interface in $SOURCE_FILE"
