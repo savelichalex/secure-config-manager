@@ -37,6 +37,7 @@ init() {
     printf "target: swift\n" > $rc_file
     printf "example: key" > $config_file
     printf "example: key" > "$config_file.sample"
+    printf "\n\n# SCM\nconfig.yml" >> .gitignore
     echo "scm files generated, please update $rc_file and $config_file"
 }
 
@@ -109,6 +110,7 @@ swiftGenerator() {
     local folder=$2
     local interface_empty_str=""
     local interface_full_str=""
+    local SOURCE_FILE
     # Parse config and create interface
     prefix="___user_config___"
     eval $(parse_yaml2 $config $prefix)
@@ -140,6 +142,8 @@ objcGenerator() {
     local interface_str=""
     local source_empty_str=""
     local source_full_str=""
+    local INTERFACE_FILE
+    local SOURCE_FILE
     # Parse config and create interface
     prefix="___user_config___"
     eval $(parse_yaml2 $config $prefix)
@@ -175,6 +179,7 @@ javaGenerator() {
     local package=$3
     local source_empty_str=""
     local source_full_str=""
+    local SOURCE_FILE
     # Parse config and create interface
     prefix="___user_config___"
     eval $(parse_yaml2 $config $prefix)
