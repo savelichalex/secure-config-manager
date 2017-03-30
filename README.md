@@ -99,6 +99,6 @@ That's all. Now you can easily use secret configs!
 secret-config-manager is on early stages, any issue reports and PR are wellcome!
 
 # Roadmap
-* generate code for obective-c
-* integration with React Native
+* ~~generate code for obective-c~~
+* ~~integration with React Native~~
 * Code obfuscation
